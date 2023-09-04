@@ -8,4 +8,16 @@ TODO
 ### file table
 TODO
 ### footer
-The footer is 78 bytes large and the last 4 bytes are a magic big endian string that reads "DVPM".
+The footer is 44 bytes large and the last 4 bytes are a magic big endian string that reads "DVPM".
+
+```c
+struct DVPMFooter
+{
+    byte unknown1[12];
+    uint32_t metaSectionSize;
+    byte unknown2[16];
+    uint32_t fileTableSectionSize;
+    byte unknown3[4];
+    char magic[4]; // "DVPM"
+}
+```
