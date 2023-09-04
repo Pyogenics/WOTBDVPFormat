@@ -4,7 +4,11 @@ WOTB dvp type file specification.
 ## .dvpm
 DVPM files are split into 3 sections: meta, file table and footer.
 ### meta
-TODO
+This section is at the very start of the file and has a magic string of "met3".
+```c
+    char magic[3]; // "met3"
+    uint32_t size;
+```
 ### file table
 TODO
 ### footer
