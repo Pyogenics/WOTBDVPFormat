@@ -1,4 +1,4 @@
-# wotb-dvpk
+# wotb-dvp
 WOTB dvp type file specification.
 
 ## .dvpm
