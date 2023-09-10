@@ -24,15 +24,34 @@ from FileIO import FileBuffer
 
 from io import SEEK_END, SEEK_SET, BytesIO
 from sys import argv
+from crc import Calculator, Crc32
 
 class ReadError(RuntimeError): pass
+
+def readMeta(data, checksum):
+    print(">>> Checking CRC")
+    if Calculator(Crc32.CRC32).checksum(data) != checksum:
+        raise ReadError("Bad meta CRC")
+    print("\tOK")
+
+    stream = BytesIO(data)
+    stream = FileBuffer(stream)
+
+    if stream.readBytes(4) != b"met3":
+        raise ReadError("Bad meta magic string")
+
+def readFileTable(data, checksum):
+    print(">>> Checking CRC")
+    if Calculator(Crc32.CRC32).checksum(data) != checksum:
+        raise ReadError("Bad meta CRC")
+    print("\tOK")
 
 def readFromBuffer(stream):
     # Read footer
     print(">> Reading footer")
     stream.seek(-4, SEEK_END)
     if stream.readBytes(4) != b"DVPM":
-        raise ReadError("Invalid magic stream")
+        raise ReadError("Invalid magic string")
     stream.seek(-44, SEEK_END)
 
     stream.readBytes(8)
@@ -45,7 +64,20 @@ def readFromBuffer(stream):
     fileTableSize = stream.readInt32(False)
     fileTableCRC = stream.readInt32(False)
 
+    stream.seek(0, SEEK_SET)
     print(f"\tmeta size: {metaSize}\n\tmeta crc: {metaCRC}\n\tmeta unknown: {metaUnknown}\n\n\tfile table size: {fileTableSize}\n\tfile table crc: {fileTableCRC}")
+ 
+    # Read meta
+    print(">> Reading meta")
+    meta = stream.readBytes(metaSize)
+    readMeta(meta, metaCRC)
+
+    # Read file table
+    print(">> Reading file table")
+    fileTable = stream.readBytes(fileTableSize)
+    readFileTable(fileTable, fileTableCRC)
+
+    print("> All done")
 
 if __name__ == "__main__":
     filepath = argv[1]
