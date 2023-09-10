@@ -1,7 +1,6 @@
 '''
 Copyright (c) 2023 Pyogenics, <https://www.github.com/Pyogenics>
 
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -22,38 +21,36 @@ SOFTWARE.
 '''
 
 from FileIO import FileBuffer
-from io import SEEK_END, BytesIO
 
+from io import SEEK_END, SEEK_SET, BytesIO
 from sys import argv
 
 class ReadError(RuntimeError): pass
 
-def reverseByteArray(array):
-    for arrayI in range(0, len(array), 4):
-        print(arrayI)
-
 def readFromBuffer(stream):
     # Read footer
+    print(">> Reading footer")
+    stream.seek(-4, SEEK_END)
+    if stream.readBytes(4) != b"DVPM":
+        raise ReadError("Invalid magic stream")
     stream.seek(-44, SEEK_END)
-    unk1 = stream.readBytes(8)
-    unk2 = stream.readInt32(False)
 
+    stream.readBytes(8)
+    metaCRC = stream.readInt32(False)
     metaSize = stream.readInt32(False)
-
-    unk3 = stream.readBytes(16)
+    stream.readBytes(4)
+    metaUnknown = stream.readInt32(False)
+    stream.readBytes(8)
 
     fileTableSize = stream.readInt32(False)
+    fileTableCRC = stream.readInt32(False)
 
-    unk4 = stream.readInt32(False)
-
-    if stream.readBytes(4) != b"DVPM":
-        raise ReadError("Invalid footer magic")
-
-    print(f"meta section size: {metaSize}, file table section size: {fileTableSize}")
+    print(f"\tmeta size: {metaSize}\n\tmeta crc: {metaCRC}\n\tmeta unknown: {metaUnknown}\n\n\tfile table size: {fileTableSize}\n\tfile table crc: {fileTableCRC}")
 
 if __name__ == "__main__":
     filepath = argv[1]
 
+    print(f"> Reading {filepath}")
     with open(filepath, "rb") as f:
         stream = FileBuffer(f)
         readFromBuffer(stream)
