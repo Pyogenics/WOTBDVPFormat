@@ -9,7 +9,7 @@ This section is at the very start of the file and has a magic string of "met3".
 struct DVPMMeta
 {
     char magic[3]; // "met3"
-    uint32_t size;
+    uint32_t footerUnknown; // Unknown value that is also present in the footer (metaSectionUnknown)
 }
 ```
 ### file table
@@ -20,11 +20,14 @@ The footer is 44 bytes large and the last 4 bytes are a magic big endian string 
 ```c
 struct DVPMFooter
 {
-    byte unknown1[12];
+    byte unknown1[8];
+    uint32_t metaSectionCRC32;
     uint32_t metaSectionSize;
-    byte unknown2[16];
-    uint32_t fileTableSectionSize;
-    byte unknown3[4];
+    byte unknown2[4];
+    uint32_t metaSectionUnknown; // Unknown value that is also present in the meta section
+    byte unknown3[8];
+    uint32_t fileTableSize;
+    uint32_t fileTableCRC32;
     char magic[4]; // "DVPM"
 }
 ```
