@@ -40,10 +40,19 @@ def readMeta(data, checksum):
     if stream.readBytes(4) != b"met3":
         raise ReadError("Bad meta magic string")
 
+    footerUnknown = stream.readInt32(False)
+    unknowns = []
+    for _ in range(footerUnknown):
+        unknowns.append([stream.readInt32(False), stream.readInt32(False)])
+
+    dvpdCount = stream.readInt32(False)
+
+    print(f"\tdvpd count: {dvpdCount}")
+
 def readFileTable(data, checksum):
     print(">>> Checking CRC")
     if Calculator(Crc32.CRC32).checksum(data) != checksum:
-        raise ReadError("Bad meta CRC")
+        raise ReadError("Bad file table CRC")
     print("\tOK")
 
 def readFromBuffer(stream):
