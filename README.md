@@ -10,6 +10,11 @@ struct DVPMMeta
 {
     char magic[3]; // "met3"
     uint32_t footerUnknown; // Unknown value that is also present in the footer (metaSectionUnknown)
+    uint32_t unknownArray[footerUnknown*2];
+    uint32_t dvpdCount;
+    uint32_t unknownArray1[dvpdCount*4]; // For every dvpd there are 16 bytes of unknown data
+    uint32_t filePathStringLength;
+    char filePathString[]; // Null seperated filepath strings
 }
 ```
 ### file table
