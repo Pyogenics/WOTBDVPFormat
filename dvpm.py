@@ -46,14 +46,22 @@ def readMeta(data, checksum):
         unknowns.append([stream.readInt32(False), stream.readInt32(False)])
 
     dvpdCount = stream.readInt32(False)
+    for _ in range(dvpdCount):
+        stream.readBytes(16)#print((stream.readInt32(False), stream.readInt32(False), stream.readInt32(False), stream.readInt32(False)))
+    filePathStringLength = stream.readInt32(False)
+    filePathString = stream.readBytes(filePathStringLength)
+    filePaths = filePathString.split(b"\x00")
 
-    print(f"\tdvpd count: {dvpdCount}")
+    print(f"\tdvpd count: {dvpdCount}\n\tfiles: {filePaths}")
 
 def readFileTable(data, checksum):
     print(">>> Checking CRC")
     if Calculator(Crc32.CRC32).checksum(data) != checksum:
         raise ReadError("Bad file table CRC")
     print("\tOK")
+
+    stream = BytesIO(data)
+    stream = FileBuffer(stream)
 
 def readFromBuffer(stream):
     # Read footer
@@ -66,15 +74,16 @@ def readFromBuffer(stream):
     stream.readBytes(8)
     metaCRC = stream.readInt32(False)
     metaSize = stream.readInt32(False)
-    stream.readBytes(4)
+    footerUnknown1 = stream.readInt32(False)
     metaUnknown = stream.readInt32(False)
-    stream.readBytes(8)
+    footerUnknown2 = stream.readInt32(False)
+    footerUnknown3 = stream.readInt32(False)
 
     fileTableSize = stream.readInt32(False)
     fileTableCRC = stream.readInt32(False)
 
     stream.seek(0, SEEK_SET)
-    print(f"\tmeta size: {metaSize}\n\tmeta crc: {metaCRC}\n\tmeta unknown: {metaUnknown}\n\n\tfile table size: {fileTableSize}\n\tfile table crc: {fileTableCRC}")
+    print(f"\tmeta size: {metaSize}\n\tmeta crc: {metaCRC}\n\tmeta unknown: {metaUnknown}\n\n\tfile table size: {fileTableSize}\n\tfile table crc: {fileTableCRC}\n\tunknowns: {footerUnknown1}\n\t{footerUnknown2}\n\t{footerUnknown3}")
  
     # Read meta
     print(">> Reading meta")
