@@ -12,8 +12,8 @@ This section is at the very start of the file and has a magic string of "met3".
 struct DVPMMeta
 {
     char magic[4]; // "met3"
-    uint32_t footerUnknown; // Unknown value that is also present in the footer (metaSectionUnknown)
-    uint32_t unknownArray[footerUnknown*2];
+    uint32_t fileCount;
+    uint32_t unknownArray[fileCount];
     uint32_t dvpdCount;
     uint32_t unknownArray1[dvpdCount*4]; // For every dvpd there are 16 bytes of unknown data
     uint32_t filePathStringLength;
@@ -53,7 +53,7 @@ struct DVPMFooter
     uint32_t metaSectionCRC32;
     uint32_t metaSectionSize;
     byte unknown2[4];
-    uint32_t metaSectionUnknown; // Unknown value that is also present in the meta section
+    uint32_t fileCount;
     byte unknown3[8];
     uint32_t fileTableSize;
     uint32_t fileTableCRC32;
