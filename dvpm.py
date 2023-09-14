@@ -34,6 +34,8 @@ def readMeta(data, checksum):
         raise ReadError("Bad meta CRC")
     print("\tOK")
 
+    size = len(data)
+
     stream = BytesIO(data)
     stream = FileBuffer(stream)
 
@@ -43,7 +45,11 @@ def readMeta(data, checksum):
     footerUnknown = stream.readInt32(False)
     unknowns = []
     for _ in range(footerUnknown):
-        unknowns.append([stream.readInt32(False), stream.readInt32(False)])
+        unknowns.append(stream.readInt32(False))
+
+    unknowns2 = []
+    for _ in range(footerUnknown):
+        unknowns2.append(stream.readInt32(False))
 
     dvpdCount = stream.readInt32(False)
     for _ in range(dvpdCount):
@@ -54,7 +60,14 @@ def readMeta(data, checksum):
 
     print(f"\tdvpd count: {dvpdCount}\n\tfiles: {filePaths}")
 
-def readFileTable(data, checksum):
+compressionLUT = [
+    "none",
+    "LZ4",
+    "LZ4_HC",
+    "RFC1951"
+]
+
+def readFileTable(data, checksum, fileCount):
     print(">>> Checking CRC")
     if Calculator(Crc32.CRC32).checksum(data) != checksum:
         raise ReadError("Bad file table CRC")
@@ -62,6 +75,14 @@ def readFileTable(data, checksum):
 
     stream = BytesIO(data)
     stream = FileBuffer(stream)
+
+    files = []
+    for _ in range(fileCount):
+        files.append((stream.readInt32(False), stream.readInt32(False), stream.readInt32(False), stream.readInt32(False), stream.readInt32(False), stream.readInt32(False), stream.readInt32(False), stream.readInt32(False)))
+
+    for file in files:
+        unk1, unk2, compressedSize, rawSize, unk3, compressionType, unk4, metaRef = file
+        print(f"compressed size: {compressedSize}, uncompressed size: {rawSize}, compression type: {compressionLUT[compressionType]}, meta section reference: {metaRef}")
 
 def readFromBuffer(stream):
     # Read footer
@@ -93,7 +114,7 @@ def readFromBuffer(stream):
     # Read file table
     print(">> Reading file table")
     fileTable = stream.readBytes(fileTableSize)
-    readFileTable(fileTable, fileTableCRC)
+    readFileTable(fileTable, fileTableCRC, metaUnknown)
 
     print("> All done")
 
