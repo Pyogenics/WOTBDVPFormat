@@ -60,3 +60,14 @@ struct DVPMFooter
     char magic[4]; // "DVPM"
 }
 ```
+
+## .dvpd
+TODO
+### footer
+The last four bytes are a magic string that read "DVPD".
+```c
+struct DVPDFooter
+{
+    char magic[4]; // "DVPD"
+}
+```
