@@ -44,7 +44,7 @@ struct DVPMFileTable
 3 RFC1951
 ```
 ### footer
-The footer is 44 bytes large and the last 4 bytes are a magic big endian string that reads "DVPM".
+The footer is 44 bytes large and the last 4 bytes are a magic string that reads "DVPM".
 
 ```c
 struct DVPMFooter
@@ -64,10 +64,13 @@ struct DVPMFooter
 ## .dvpd
 TODO
 ### footer
-The last four bytes are a magic string that read "DVPD".
+The footer is 32 bytes large and the last four bytes are a magic string that read "DVPD".
 ```c
 struct DVPDFooter
 {
+    byte unknown1[16];
+    uint64_t dataSize; // File size - header size (file size - 32)
+    byte unknown2[4];
     char magic[4]; // "DVPD"
 }
 ```
