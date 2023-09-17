@@ -33,9 +33,9 @@ struct DVPMFileTable
         uint64_t fileOffset; // Offset to the file inside the dvpd data block
         uint32_t compressedSize;
         uint32_t uncompressedSize;
-        uint32_t unknown3;
+        uint32_t compressedCRC32;
         uint32_t compressionType;
-        uint32_t unknown4;
+        uint32_t uncompressedCRC32;
         uint32_t metaSectionReference;
     } FileEntries[];
 }
