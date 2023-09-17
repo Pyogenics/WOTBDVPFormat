@@ -15,7 +15,12 @@ struct DVPMMeta
     uint32_t fileCount;
     uint32_t unknownArray[fileCount];
     uint32_t dvpdCount;
-    uint32_t unknownArray1[dvpdCount*4]; // For every dvpd there are 16 bytes of unknown data
+    struct {
+        uint32_t dvpdUnknown1;
+        uint32_t dvpdUnknown2;
+        uint32_t dvpdUnknown3;
+        uint32_t dvpdUnknown4;
+    } dvpdInfo[dvpdCount]; // For every dvpd there are 16 bytes of unknown data
     uint32_t filePathStringLength;
     char filePathString[]; // Null seperated filepath strings
 }
@@ -68,9 +73,14 @@ The footer is 32 bytes large and the last four bytes are a magic string that rea
 ```c
 struct DVPDFooter
 {
-    byte unknown1[16];
+    struct {
+        uint32_t dvpdUnknown1;
+        uint32_t dvpdUnknown2;
+        uint32_t dvpdUnknown3;
+        uint32_t dvpdUnknown4;
+    } dvpdInfo; // Matches with dvpdInfo in DVPM meta section
     uint64_t dataSize; // File size - header size (file size - 32)
-    byte unknown2[4];
+    uint32_t dataCRC32;
     char magic[4]; // "DVPD"
 }
 ```
