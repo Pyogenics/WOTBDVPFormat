@@ -30,8 +30,7 @@ struct DVPMMeta
 struct DVPMFileTable
 {
     struct {
-        uint32_t unknown1;
-        uint32_t unknown2;
+        uint64_t fileOffset; // Offset to the file inside the dvpd data block
         uint32_t compressedSize;
         uint32_t uncompressedSize;
         uint32_t unknown3;
