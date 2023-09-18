@@ -23,6 +23,9 @@ struct DVPMMeta
     } dvpdInfo[dvpdCount]; // For every dvpd there are 16 bytes of unknown data
     uint32_t filePathStringLength;
     char filePathString[]; // Null seperated filepath strings
+    uint32_t packStringsRawSize;
+    uint32_t packStringCompressedSize;
+    byte packStrings[]; // lz4 encoded "pack" strings
 }
 ```
 ### file table
@@ -38,6 +41,7 @@ struct DVPMFileTable
         uint32_t uncompressedCRC32;
         uint32_t metaSectionReference;
     } FileEntries[];
+    byte filePaths[]; // lz4 encoded file paths string (separated by null bytes), see footer "fileTableFilepaths"
 }
 ```
 #### Compression types
@@ -58,7 +62,8 @@ struct DVPMFooter
     uint32_t metaSectionSize;
     byte unknown2[4];
     uint32_t fileCount;
-    byte unknown3[8];
+    uint32_t fileTableFilepathsCompressedSize;
+    uint32_t fileTableFilepathsRawSize;
     uint32_t fileTableSize;
     uint32_t fileTableCRC32;
     char magic[4]; // "DVPM"
